@@ -1,5 +1,9 @@
 # Student Record Manager
 
+## 🚀 Live Demo
+
+👉 [Open Student Record Manager](https://firdausjaha.github.io/Student-Record-Manager/)
+
 A complete C++ lab project presented through a modern web interface.
 
 ## Project focus
