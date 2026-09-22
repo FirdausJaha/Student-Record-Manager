@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173f73">
+  <title>Student Record Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="img"><path d="M8 25 32 12l24 13-24 13L8 25Z"/><path d="M17 31v12c8 7 22 7 30 0V31"/><path d="M56 26v17"/></svg>
+        </div>
+        <div>
+          <div class="brand-title">Student Record</div>
+          <div class="brand-subtitle">Manager</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Main navigation">
+        <button class="nav-item active" data-screen="dashboard"><span class="nav-icon">⌂</span>Dashboard</button>
+        <button class="nav-item" data-screen="students"><span class="nav-icon">▤</span>Students</button>
+        <button class="nav-item" data-screen="search"><span class="nav-icon">⌕</span>Search</button>
+        <button class="nav-item" data-screen="analysis"><span class="nav-icon">◒</span>Analysis</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="capacity-card">
+          <div class="capacity-head"><span>Records</span><strong id="capacityText">0 / 100</strong></div>
+          <div class="capacity-track"><span id="capacityBar"></span></div>
+          <p>Student records can be managed from the dashboard.</p>
+        </div>
+      </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+        <div>
+          <div class="breadcrumb" id="breadcrumb">Overview</div>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <button class="add-top" id="openAddTop"><span>+</span> Add Student</button>
+      </header>
+
+      <div class="content">
+        <!-- Dashboard -->
+        <section class="screen active" id="screen-dashboard">
+          <div class="welcome-row">
+            <div>
+              <h2>Student records at a glance</h2>
+              <p>Manage, search and analyze student performance from one place.</p>
+            </div>
+            <button class="primary large" id="openAddDashboard"><span>+</span> Add Student</button>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card blue">
+              <div class="stat-icon">▤</div><div><span>Total Students</span><strong id="totalStudents">0</strong></div>
+            </article>
+            <article class="stat-card green">
+              <div class="stat-icon">↗</div><div><span>Average Score</span><strong id="averageMarks">—</strong></div>
+            </article>
+            <article class="stat-card gold">
+              <div class="stat-icon">★</div><div><span>Highest Score</span><strong id="topMarks">—</strong></div>
+            </article>
+            <article class="stat-card red">
+              <div class="stat-icon">↓</div><div><span>Lowest Score</span><strong id="lowMarks">—</strong></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel">
+              <div class="panel-head"><div><h3>Recent Students</h3><p>Latest records in the manager</p></div><button class="text-button" data-screen-link="students">View all →</button></div>
+              <div class="mini-table-wrap"><table><thead><tr><th>Roll No.</th><th>Name</th><th>Score</th></tr></thead><tbody id="recentBody"></tbody></table></div>
+              <div class="empty compact" id="recentEmpty">No student records yet. Add the first student to get started.</div>
+            </article>
+            <article class="panel highlight-panel">
+              <div class="panel-head"><div><h3>Performance</h3><p>Based on current records</p></div><span class="round-icon">◒</span></div>
+              <div class="performance-value" id="performanceValue">—</div>
+              <div class="performance-label">Average score</div>
+              <div class="progress"><span id="performanceBar"></span></div>
+              <div class="performance-meta"><span id="passCount">0</span> students at or above 40</div>
+            </article>
+          </div>
+
+          <article class="panel quick-panel">
+            <div class="panel-head"><div><h3>Quick actions</h3><p>Common tasks</p></div><button class="danger-outline" id="clearAllRecords">Clear all records</button></div>
+            <div class="quick-actions">
+              <button class="quick-action" id="quickAdd"><span class="qa-icon">+</span><span><strong>Add Student</strong><small>Create a new record</small></span><b>→</b></button>
+              <button class="quick-action" data-screen-link="search"><span class="qa-icon">⌕</span><span><strong>Search Records</strong><small>Find by roll or name</small></span><b>→</b></button>
+              <button class="quick-action" data-screen-link="analysis"><span class="qa-icon">◒</span><span><strong>View Analysis</strong><small>Review performance</small></span><b>→</b></button>
+            </div>
+          </article>
+        </section>
+
+        <!-- Students -->
+        <section class="screen" id="screen-students">
+          <div class="section-heading"><div><h2>Student Records</h2><p>View and manage all stored student records.</p></div><button class="primary" id="openAddStudents"><span>+</span> Add Student</button></div>
+          <article class="panel">
+            <div class="toolbar">
+              <div class="search-inline"><span>⌕</span><input id="tableFilter" placeholder="Search by roll number or name..."></div>
+              <select id="sortSelect" class="select"><option value="default">Sort: Recent</option><option value="name">Name A–Z</option><option value="high">Score: High to Low</option><option value="low">Score: Low to High</option></select>
+            </div>
+            <div class="table-wrap"><table class="main-table"><thead><tr><th>Roll Number</th><th>Student Name</th><th>Marks / CGPA</th><th>Actions</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
+            <div class="empty" id="tableEmpty"><div class="empty-icon">▤</div><h3>No records found</h3><p>Add a student to start building the record list.</p><button class="primary" id="emptyAdd">Add Student</button></div>
+            <div class="table-footer"><span id="countText">0 records</span><span>Maximum 100 records</span></div>
+          </article>
+        </section>
+
+        <!-- Search -->
+        <section class="screen" id="screen-search">
+          <div class="section-heading"><div><h2>Search Students</h2><p>Find records quickly by roll number or student name.</p></div></div>
+          <article class="search-hero panel">
+            <div class="search-tabs"><button class="search-tab active" data-search-type="roll">Roll Number</button><button class="search-tab" data-search-type="name">Student Name</button></div>
+            <div class="big-search"><input id="searchValue" type="text" placeholder="Enter roll number..."><button class="primary" id="searchBtn">Search</button></div>
+            <div class="search-hint" id="searchHint">Search uses the student roll number.</div>
+          </article>
+          <div id="searchResults" class="search-results"></div>
+        </section>
+
+        <!-- Analysis -->
+        <section class="screen" id="screen-analysis">
+          <div class="section-heading"><div><h2>Performance Analysis</h2><p>Insights calculated from the current student records.</p></div></div>
+          <div class="analysis-grid">
+            <article class="analysis-feature highest-card"><span class="feature-label">HIGHEST SCORE</span><div class="feature-icon">★</div><h3 id="highestName">—</h3><p id="highestDetails">Add records to view the highest score.</p></article>
+            <article class="analysis-feature lowest-card"><span class="feature-label">LOWEST SCORE</span><div class="feature-icon">↓</div><h3 id="lowestName">—</h3><p id="lowestDetails">Add records to view the lowest score.</p></article>
+            <article class="analysis-feature average-card"><span class="feature-label">AVERAGE SCORE</span><div class="feature-icon">◒</div><h3 id="analysisAverage">—</h3><p>Calculated across all stored students.</p></article>
+          </div>
+          <div class="analysis-lower">
+            <article class="panel">
+              <div class="panel-head"><div><h3>Score overview</h3><p>Simple distribution of current records</p></div></div>
+              <div id="scoreBars" class="score-bars"></div>
+            </article>
+            <article class="panel analysis-summary">
+              <div class="panel-head"><div><h3>Summary</h3><p>Current record statistics</p></div></div>
+              <div class="summary-list">
+                <div><span>Total students</span><strong id="summaryTotal">0</strong></div>
+                <div><span>Average score</span><strong id="summaryAverage">—</strong></div>
+                <div><span>At or above 40</span><strong id="summaryPass">0</strong></div>
+                <div><span>Below 40</span><strong id="summaryBelow">0</strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add / Update dialog -->
+  <dialog id="studentDialog">
+    <form id="studentForm" method="dialog">
+      <div class="dialog-head"><div><span class="dialog-kicker" id="dialogKicker">NEW RECORD</span><h2 id="dialogTitle">Add Student</h2><p>Enter the student's details below.</p></div><button type="button" class="icon-close" id="closeDialog">×</button></div>
+      <input id="editingRoll" type="hidden">
+      <div class="form-grid">
+        <label>Roll Number<input id="roll" type="number" min="1" max="999999" required placeholder="e.g. 259"></label>
+        <label>Student Name<input id="name" type="text" maxlength="80" required placeholder="e.g. Firdaus"></label>
+        <label class="full">Marks / CGPA<input id="marks" type="number" min="0" max="100" step="0.01" required placeholder="e.g. 9.5"></label>
+      </div>
+      <p class="field-note">Use a unique roll number. Scores from 0 to 100 are accepted, so values such as 9.5 are valid.</p>
+      <div id="formMessage" class="form-message"></div>
+      <div class="dialog-actions"><button type="button" class="secondary" id="cancelDialog">Cancel</button><button type="submit" class="primary" id="saveStudent">Add Student</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    // The browser layer only connects the interface to the C++/WebAssembly functions.
+    var Module = {
+      onRuntimeInitialized: function () {
+        window.cppReady = true;
+        restoreSavedRecords();
+        refreshAll();
+      }
+    };
+
+    let searchType = 'roll';
+    let allRecords = [];
+
+    const $ = id => document.getElementById(id);
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    }
+
+    function parseRecords(raw) {
+      if (!raw) return [];
+      return raw.split('|').filter(Boolean).map(row => {
+        const [roll, name, marks] = row.split('~');
+        return { roll: Number(roll), name: name || '', marks: Number(marks) };
+      });
+    }
+
+    function formatScore(value) { return Number(value).toFixed(2).replace(/\.00$/, ''); }
+
+    function saveRecords() {
+      if (!window.cppReady) return;
+      localStorage.setItem('student-record-manager-records', Module.getRecords());
+    }
+
+    function restoreSavedRecords() {
+      const saved = localStorage.getItem('student-record-manager-records');
+      if (saved) Module.importRecords(saved);
+    }
+
+    function showToast(message, type='success') {
+      const toast = $('toast'); toast.textContent = message; toast.className = `toast show ${type}`;
+      clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function navigate(screen) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $(`screen-${screen}`).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.screen === screen));
+      const meta = {dashboard:['Overview','Dashboard'],students:['Records','Student Records'],search:['Find','Search Students'],analysis:['Insights','Performance Analysis']}[screen];
+      $('breadcrumb').textContent = meta[0]; $('pageTitle').textContent = meta[1];
+      $('sidebar').classList.remove('open'); $('mobileOverlay').classList.remove('show');
+      if (screen === 'students') renderTable();
+      if (screen === 'analysis') renderAnalysis();
+    }
+
+    document.querySelectorAll('.nav-item').forEach(b => b.addEventListener('click', () => navigate(b.dataset.screen)));
+    document.querySelectorAll('[data-screen-link]').forEach(b => b.addEventListener('click', () => navigate(b.dataset.screenLink)));
+
+    function openAddDialog() {
+      $('studentForm').reset(); $('editingRoll').value = ''; $('roll').disabled = false;
+      $('dialogKicker').textContent = 'NEW RECORD'; $('dialogTitle').textContent = 'Add Student'; $('saveStudent').textContent = 'Add Student';
+      $('formMessage').textContent = ''; $('formMessage').className = 'form-message';
+      $('studentDialog').showModal(); setTimeout(() => $('roll').focus(), 80);
+    }
+
+    function openEditDialog(roll, name, marks) {
+      $('editingRoll').value = roll; $('roll').value = roll; $('roll').disabled = true; $('name').value = name; $('marks').value = marks;
+      $('dialogKicker').textContent = 'EDIT RECORD'; $('dialogTitle').textContent = 'Update Student'; $('saveStudent').textContent = 'Save Changes';
+      $('formMessage').textContent = ''; $('formMessage').className = 'form-message'; $('studentDialog').showModal(); setTimeout(() => $('name').focus(), 80);
+    }
+
+    function closeDialog() { $('studentDialog').close(); }
+    ['openAddTop','openAddDashboard','openAddStudents','emptyAdd','quickAdd'].forEach(id => $(id).addEventListener('click', openAddDialog));
+    $('closeDialog').addEventListener('click', closeDialog); $('cancelDialog').addEventListener('click', closeDialog);
+    $('studentDialog').addEventListener('click', e => { if (e.target === $('studentDialog')) closeDialog(); });
+
+    function addErrorMessage(code, editing) {
+      if (editing) {
+        return ({1:'Student record was not found.',2:'Student name contains unsupported characters.',3:'Marks must be between 0 and 100.'}[code]) || 'Update failed. Please check the details.';
+      }
+      return ({1:'Enter a valid positive roll number.',2:'That roll number already exists.',3:"Use letters, spaces, '.', '-' or apostrophe in the name.",4:'The maximum of 100 student records has been reached.',5:'Marks must be between 0 and 100.'}[code]) || 'Could not add the record. Please check the details.';
+    }
+
+    $('studentForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if (!window.cppReady) { showToast('Please wait a moment and try again.', 'error'); return; }
+      const roll = Number($('roll').value), name = $('name').value.trim(), marks = Number($('marks').value), editing = $('editingRoll').value;
+      const result = editing
+        ? Module.updateStudentResult(Number(editing), name, marks)
+        : Module.addStudentResult(roll, name, marks);
+      if (result !== 0) {
+        $('formMessage').textContent = addErrorMessage(result, Boolean(editing));
+        $('formMessage').className = 'form-message error';
+        return;
+      }
+      saveRecords(); closeDialog(); refreshAll();
+      showToast(editing ? 'Student record updated.' : 'Student record added.');
+    });
+
+    function deleteRecord(roll) {
+      const student = allRecords.find(r => r.roll === roll);
+      if (!student) return;
+      if (!confirm(`Delete the record for ${student.name} (Roll No. ${student.roll})?`)) return;
+      if (Module.deleteStudent(roll)) { saveRecords(); refreshAll(); showToast('Student record deleted.'); }
+    }
+
+    function clearAllRecords() {
+      if (!window.cppReady) { showToast('Please wait a moment and try again.', 'error'); return; }
+      if (!allRecords.length) { showToast('There are no student records to clear.', 'error'); return; }
+      if (!confirm(`Delete all ${allRecords.length} student records? This cannot be undone.`)) return;
+      Module.clearAll();
+      saveRecords();
+      refreshAll();
+      showToast('All student records were cleared.');
+    }
+
+    $('clearAllRecords').addEventListener('click', clearAllRecords);
+
+    function renderTable() {
+      const filter = $('tableFilter').value.trim().toLowerCase();
+      let records = [...allRecords];
+      const sort = $('sortSelect').value;
+      if (sort === 'name') records = parseRecords(Module.sortByName());
+      if (sort === 'high') records = parseRecords(Module.selectionSortByMarks(true));
+      if (sort === 'low') records = parseRecords(Module.selectionSortByMarks(false));
+      if (filter) records = records.filter(r => String(r.roll).includes(filter) || r.name.toLowerCase().includes(filter));
+      const body = $('recordsBody'); body.innerHTML = '';
+      records.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><span class="roll-pill">${s.roll}</span></td><td><div class="student-cell"><span class="avatar">${escapeHtml(s.name.charAt(0).toUpperCase())}</span><strong>${escapeHtml(s.name)}</strong></div></td><td><strong>${formatScore(s.marks)}</strong></td><td><div class="row-actions"><button class="action-btn edit" title="Update" data-action="edit" data-roll="${s.roll}">Edit</button><button class="action-btn delete" title="Delete" data-action="delete" data-roll="${s.roll}">Delete</button></div></td>`;
+        body.appendChild(tr);
+      });
+      $('tableEmpty').style.display = records.length ? 'none' : 'flex';
+      $('countText').textContent = `${records.length} record${records.length === 1 ? '' : 's'}`;
+      body.querySelectorAll('[data-action="edit"]').forEach(btn => btn.addEventListener('click', () => { const s = allRecords.find(r => r.roll === Number(btn.dataset.roll)); if (s) openEditDialog(s.roll, s.name, s.marks); }));
+      body.querySelectorAll('[data-action="delete"]').forEach(btn => btn.addEventListener('click', () => deleteRecord(Number(btn.dataset.roll))));
+    }
+
+    $('tableFilter').addEventListener('input', renderTable); $('sortSelect').addEventListener('change', renderTable);
+
+    function renderSearch() {
+      const value = $('searchValue').value.trim(); const container = $('searchResults'); container.innerHTML = '';
+      if (!value) return;
+      const raw = searchType === 'roll' ? Module.searchByRoll(Number(value)) : Module.searchByName(value);
+      const records = parseRecords(raw);
+      if (!records.length) { container.innerHTML = `<article class="not-found"><div class="not-found-icon">⌕</div><h3>No student found</h3><p>Try another ${searchType === 'roll' ? 'roll number' : 'name'}.</p></article>`; return; }
+      records.forEach(s => { const card = document.createElement('article'); card.className = 'result-card'; card.innerHTML = `<div class="result-avatar">${escapeHtml(s.name.charAt(0).toUpperCase())}</div><div class="result-main"><span>Roll No. ${s.roll}</span><h3>${escapeHtml(s.name)}</h3></div><div class="result-score"><small>Marks / CGPA</small><strong>${formatScore(s.marks)}</strong></div><button class="outline-btn result-edit">Edit</button>`; card.querySelector('.result-edit').addEventListener('click', () => openEditDialog(s.roll, s.name, s.marks)); container.appendChild(card); });
+    }
+
+    document.querySelectorAll('.search-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); searchType = tab.dataset.searchType; $('searchValue').value = ''; $('searchValue').placeholder = searchType === 'roll' ? 'Enter roll number...' : 'Enter student name...'; $('searchHint').textContent = searchType === 'roll' ? 'Search uses the student roll number.' : 'Search is case-insensitive and can match part of a name.'; $('searchResults').innerHTML = ''; $('searchValue').focus(); }));
+    $('searchBtn').addEventListener('click', renderSearch); $('searchValue').addEventListener('keydown', e => { if (e.key === 'Enter') renderSearch(); });
+
+    function renderAnalysis() {
+      const analysis = Module.getAnalysis();
+      const total = allRecords.length; $('summaryTotal').textContent = total; $('summaryPass').textContent = Module.passCount(40); $('summaryBelow').textContent = Math.max(0, total - Module.passCount(40));
+      const avg = total ? Number(Module.averageMarks()) : 0; $('summaryAverage').textContent = total ? formatScore(avg) : '—'; $('analysisAverage').textContent = total ? formatScore(avg) : '—';
+      if (!analysis) { $('highestName').textContent = '—'; $('lowestName').textContent = '—'; $('highestDetails').textContent = 'Add records to view the highest score.'; $('lowestDetails').textContent = 'Add records to view the lowest score.'; $('scoreBars').innerHTML = `<div class="empty compact">Add students to see the score overview.</div>`; return; }
+      const parts = analysis.split('|').map(parseRecords).flat(); const hi = parts[0], lo = parts[1];
+      $('highestName').textContent = hi.name; $('highestDetails').textContent = `Roll No. ${hi.roll} • ${formatScore(hi.marks)} score`; $('lowestName').textContent = lo.name; $('lowestDetails').textContent = `Roll No. ${lo.roll} • ${formatScore(lo.marks)} score`;
+      const buckets = [0,0,0,0,0]; allRecords.forEach(s => { const index = Math.min(4, Math.floor(s.marks / 20)); buckets[index]++; });
+      const max = Math.max(1, ...buckets); $('scoreBars').innerHTML = buckets.map((count, i) => `<div class="bar-row"><span>${i*20}–${i===4?100:(i+1)*20-1}</span><div class="bar-track"><i style="width:${(count/max)*100}%"></i></div><strong>${count}</strong></div>`).join('');
+    }
+
+    function refreshAll() {
+      if (!window.cppReady) return;
+      allRecords = parseRecords(Module.getRecords());
+      const total = allRecords.length; $('totalStudents').textContent = total; $('countText').textContent = `${total} record${total === 1 ? '' : 's'}`;
+      $('capacityText').textContent = `${total} / 100`; $('capacityBar').style.width = `${Math.min(100, total)}%`;
+      const analysis = Module.getAnalysis(); const avg = total ? Number(Module.averageMarks()) : 0;
+      $('averageMarks').textContent = total ? formatScore(avg) : '—'; $('performanceValue').textContent = total ? formatScore(avg) : '—'; $('performanceBar').style.width = `${Math.min(100, avg)}%`; $('passCount').textContent = total ? Module.passCount(40) : 0;
+      if (analysis) { const parts = analysis.split('|').map(parseRecords).flat(); const hi = parts[0], lo = parts[1]; $('topMarks').textContent = formatScore(hi.marks); $('lowMarks').textContent = formatScore(lo.marks); } else { $('topMarks').textContent = '—'; $('lowMarks').textContent = '—'; }
+      const recent = allRecords.slice(-5).reverse(); $('recentBody').innerHTML = recent.map(s => `<tr><td>${s.roll}</td><td>${escapeHtml(s.name)}</td><td><strong>${formatScore(s.marks)}</strong></td></tr>`).join(''); $('recentEmpty').style.display = recent.length ? 'none' : 'block';
+      renderTable(); renderAnalysis();
+    }
+
+    $('mobileMenu').addEventListener('click', () => { $('sidebar').classList.add('open'); $('mobileOverlay').classList.add('show'); }); $('mobileOverlay').addEventListener('click', () => { $('sidebar').classList.remove('open'); $('mobileOverlay').classList.remove('show'); });
+  </script>
+  <script src="wasm/student_manager.js"></script>
+</body>
+</html>

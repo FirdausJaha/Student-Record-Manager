@@ -1,0 +1,4 @@
+# Generated WebAssembly build output
+wasm/student_manager.js
+wasm/student_manager.wasm
+wasm/student_manager.data
